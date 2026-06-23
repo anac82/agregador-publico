@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agregador de Pesquisas — Presidente 2026</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 16px; background: #f9f9f9; color: #333; max-width: 900px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.3rem; margin-bottom: 4px; }
+  .sub { color: #666; font-size: 0.85rem; margin-bottom: 16px; }
+  .grafico-wrap { position: relative; width: 100%; height: 380px; margin-bottom: 16px; background: #fff; border-radius: 8px; padding: 8px; box-sizing: border-box; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .sem-dados { display: flex; align-items: center; justify-content: center; height: 100%; color: #999; font-size: 1rem; }
+  .legenda-tend { font-size: 0.78rem; color: #555; margin-bottom: 12px; }
+  .rodape { font-size: 0.75rem; color: #888; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 16px; }
+  .ultimas { font-size: 0.78rem; margin-bottom: 12px; }
+  .ultimas ul { margin: 4px 0; padding-left: 20px; }
+  .ultimas li { margin-bottom: 2px; }
+  .secao-label { font-size:0.8rem; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+  details summary { cursor: pointer; font-weight: bold; font-size: 0.82rem; color: #555; }
+  code { background: #eee; padding: 1px 4px; border-radius: 3px; font-size: 0.75rem; }
+</style>
+</head>
+<body>
+<h1>Intenção de voto — 1º Turno</h1>
+<div class="sub">Média ponderada por recência, amostra e metodologia · Eleições presidenciais 2026 · Atualizado em 23 de junho de 2026</div>
+
+<div class="secao-label">Lula e Flávio Bolsonaro</div>
+<div class="grafico-wrap">
+  <canvas id="grafico" role="img" aria-label="Gráfico de evolução da intenção de voto — Lula e Flávio."></canvas>
+</div>
+<div class="legenda-tend" id="legenda-tend"></div>
+
+<div class="secao-label" id="label-sec" style="display:none">Demais candidatos</div>
+<div class="grafico-wrap" id="wrap-sec" style="display:none;height:260px">
+  <canvas id="grafico-sec" role="img" aria-label="Gráfico de evolução — demais candidatos."></canvas>
+</div>
+<div class="legenda-tend" id="legenda-tend-sec"></div>
+<div class="ultimas">
+  <details>
+    <summary>Últimas pesquisas consideradas →</summary>
+    <ul><li><b>Indexa</b> (18 de jun, n=2.000) <code>BR-08944/2026</code></li>
+<li><b>Datafolha</b> (17 de jun, n=2.004) <code>BR-09956/2026</code></li>
+<li><b>AtlasIntel</b> (16 de jun, n=1.200) <code>BR-08344/2026</code></li>
+<li><b>Nexus/FSB</b> (12 de jun, n=2.017) <code>BR-06645/2026</code></li>
+<li><b>AMERICAN ANALYTICS</b> (11 de jun, n=2.000) <code>BR-09521/2026</code></li>
+<li><b>MDA</b> (10 de jun, n=2.002) <code>BR-04256/2026</code></li>
+<li><b>Vox Brasil</b> (10 de jun, n=1.100) <code>BR-02448/2026</code></li>
+<li><b>Futura Inteligência</b> (8 de jun, n=2.000) <code>BR-01461/2026</code></li>
+<li><b>Quaest</b> (5 de jun, n=2.004) <code>BR-07661/2026</code></li>
+<li><b>Alfa Inteligência</b> (5 de jun, n=1.400) <code>BR-03496/2026</code></li></ul>
+  </details>
+</div>
+
+<h2 style="font-size:1.1rem;margin:24px 0 4px;color:#333">Simulações de 2º turno</h2>
+<div class="sub" style="margin-bottom:12px">Média ponderada dos confrontos diretos testados nas pesquisas</div>
+<div id="graficos-2t"></div>
+
+<div class="rodape">
+  Fonte: agregação própria de pesquisas registradas no TSE. A seta indica a tendência vs 4 semanas atrás. Agregador independente, sem fins comerciais.
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function(){
+  var DADOS = {"labels": ["11/jan", "18/jan", "25/jan", "01/fev", "08/fev", "15/fev", "22/fev", "01/mar", "08/mar", "15/mar", "22/mar", "29/mar", "05/abr", "12/abr", "19/abr", "26/abr", "03/mai", "10/mai", "17/mai", "24/mai", "31/mai", "07/jun", "14/jun", "21/jun", "23/jun"], "series": [{"label": "Lula", "cor": "#C0392B", "dados": [39.0, 39.2, 40.8, 40.7, 39.9, 39.5, 38.5, 39.8, 39.1, 39.0, 39.1, 39.6, 40.4, 39.6, 38.8, 38.5, 39.2, 39.6, 39.2, 40.0, 39.6, 39.5, 40.2, 41.2, 41.2], "largura": 3.5}, {"label": "Flávio", "cor": "#2471A3", "dados": [32.0, 30.8, 31.9, 32.0, 31.1, 31.9, 31.5, 32.9, 34.4, 33.9, 34.0, 34.8, 34.7, 35.3, 34.4, 34.0, 34.4, 34.5, 34.8, 33.6, 33.2, 33.0, 31.4, 31.0, 31.0], "largura": 3.5}, {"label": "Caiado", "cor": "#7D8A2E", "dados": [null, 5.5, 4.8, 4.5, 4.8, 4.8, 4.9, 4.8, 4.3, 4.3, 4.2, 4.2, 4.1, 4.6, 5.0, 5.1, 5.0, 5.3, 3.8, 3.7, 4.0, 4.0, 3.9, 3.8, 3.8], "largura": 2}, {"label": "Renan", "cor": "#7E57C2", "dados": [2.0, 1.7, 2.0, 1.9, 1.9, 2.1, 1.9, 2.1, 2.4, 2.0, 2.0, 2.3, 2.1, 2.2, 2.2, 2.1, 2.4, 2.7, 2.4, 2.8, 3.0, 3.0, 3.2, 3.1, 3.1], "largura": 2}, {"label": "Zema", "cor": "#CA8A04", "dados": [5.0, 5.1, 4.5, 4.3, 4.0, 2.9, 2.9, 3.1, 3.6, 3.1, 3.2, 3.2, 2.7, 3.4, 3.3, 3.3, 3.3, 3.3, 3.5, 3.6, 3.6, 3.6, 3.1, 2.6, 2.6], "largura": 2}], "passo_dias": 7, "janela_dias": 30, "series_sec": [{"label": "Caiado", "cor": "#7D8A2E", "dados": [null, 5.5, 4.8, 4.5, 4.8, 4.8, 4.9, 4.8, 4.3, 4.3, 4.2, 4.2, 4.1, 4.6, 5.0, 5.1, 5.0, 5.3, 3.8, 3.7, 4.0, 4.0, 3.9, 3.8, 3.8], "largura": 2}, {"label": "Renan", "cor": "#7E57C2", "dados": [2.0, 1.7, 2.0, 1.9, 1.9, 2.1, 1.9, 2.1, 2.4, 2.0, 2.0, 2.3, 2.1, 2.2, 2.2, 2.1, 2.4, 2.7, 2.4, 2.8, 3.0, 3.0, 3.2, 3.1, 3.1], "largura": 2}, {"label": "Zema", "cor": "#CA8A04", "dados": [5.0, 5.1, 4.5, 4.3, 4.0, 2.9, 2.9, 3.1, 3.6, 3.1, 3.2, 3.2, 2.7, 3.4, 3.3, 3.3, 3.3, 3.3, 3.5, 3.6, 3.6, 3.6, 3.1, 2.6, 2.6], "largura": 2}], "slopes": {"Cury": 0.026, "Flávio": -0.586, "Renan": 0.105, "Branco/Nulo": -0.517, "Não sabe": -0.047, "Zema": -0.158, "Hertz": -0.035, "Samara": 0.044, "Caiado": -0.108, "Lula": 0.34, "Aldo": -0.073, "Daciolo": 0.023, "Rui": 0.052}, "raw": [{"idx": 0, "cand": "Lula", "val": 39.0, "inst": "Quaest", "data": "2026-01-11"}, {"idx": 0, "cand": "Flávio", "val": 32.0, "inst": "Quaest", "data": "2026-01-11"}, {"idx": 0, "cand": "Zema", "val": 5.0, "inst": "Quaest", "data": "2026-01-11"}, {"idx": 0, "cand": "Renan", "val": 2.0, "inst": "Quaest", "data": "2026-01-11"}, {"idx": 0, "cand": "Lula", "val": 39.6, "inst": "Meio/Ideia", "data": "2026-01-12"}, {"idx": 0, "cand": "Flávio", "val": 27.6, "inst": "Meio/Ideia", "data": "2026-01-12"}, {"idx": 0, "cand": "Zema", "val": 5.4, "inst": "Meio/Ideia", "data": "2026-01-12"}, {"idx": 0, "cand": "Caiado", "val": 5.5, "inst": "Meio/Ideia", "data": "2026-01-12"}, {"idx": 0, "cand": "Renan", "val": 0.7, "inst": "Meio/Ideia", "data": "2026-01-12"}, {"idx": 1, "cand": "Lula", "val": 48.8, "inst": "AtlasIntel", "data": "2026-01-20"}, {"idx": 1, "cand": "Flávio", "val": 35.0, "inst": "AtlasIntel", "data": "2026-01-20"}, {"idx": 1, "cand": "Zema", "val": 2.8, "inst": "AtlasIntel", "data": "2026-01-20"}, {"idx": 1, "cand": "Caiado", "val": 4.3, "inst": "AtlasIntel", "data": "2026-01-20"}, {"idx": 1, "cand": "Renan", "val": 3.4, "inst": "AtlasIntel", "data": "2026-01-20"}, {"idx": 1, "cand": "Lula", "val": 38.5, "inst": "100%Cidades/Futura", "data": "2026-01-19"}, {"idx": 1, "cand": "Flávio", "val": 34.2, "inst": "100%Cidades/Futura", "data": "2026-01-19"}, {"idx": 1, "cand": "Zema", "val": 3.1, "inst": "100%Cidades/Futura", "data": "2026-01-19"}, {"idx": 1, "cand": "Caiado", "val": 4.3, "inst": "100%Cidades/Futura", "data": "2026-01-19"}, {"idx": 1, "cand": "Renan", "val": 2.0, "inst": "100%Cidades/Futura", "data": "2026-01-19"}, {"idx": 2, "cand": "Lula", "val": 39.8, "inst": "Paraná Pesquisas", "data": "2026-01-28"}, {"idx": 2, "cand": "Flávio", "val": 33.1, "inst": "Paraná Pesquisas", "data": "2026-01-28"}, {"idx": 2, "cand": "Zema", "val": 2.8, "inst": "Paraná Pesquisas", "data": "2026-01-28"}, {"idx": 2, "cand": "Caiado", "val": 3.7, "inst": "Paraná Pesquisas", "data": "2026-01-28"}, {"idx": 2, "cand": "Renan", "val": 1.5, "inst": "Paraná Pesquisas", "data": "2026-01-28"}, {"idx": 3, "cand": "Lula", "val": 39.0, "inst": "Gerp", "data": "2026-02-02"}, {"idx": 3, "cand": "Flávio", "val": 35.0, "inst": "Gerp", "data": "2026-02-02"}, {"idx": 4, "cand": "Lula", "val": 39.0, "inst": "Real Time Big Data", "data": "2026-02-07"}, {"idx": 4, "cand": "Flávio", "val": 30.0, "inst": "Real Time Big Data", "data": "2026-02-07"}, {"idx": 5, "cand": "Lula", "val": 38.0, "inst": "Quaest", "data": "2026-02-14"}, {"idx": 5, "cand": "Flávio", "val": 33.0, "inst": "Quaest", "data": "2026-02-14"}, {"idx": 5, "cand": "Zema", "val": 3.0, "inst": "Quaest", "data": "2026-02-14"}, {"idx": 5, "cand": "Caiado", "val": 5.0, "inst": "Quaest", "data": "2026-02-14"}, {"idx": 5, "cand": "Renan", "val": 2.0, "inst": "Quaest", "data": "2026-02-14"}, {"idx": 6, "cand": "Lula", "val": 45.0, "inst": "AtlasIntel", "data": "2026-02-24"}, {"idx": 6, "cand": "Flávio", "val": 37.9, "inst": "AtlasIntel", "data": "2026-02-24"}, {"idx": 6, "cand": "Zema", "val": 3.9, "inst": "AtlasIntel", "data": "2026-02-24"}, {"idx": 6, "cand": "Caiado", "val": 4.9, "inst": "AtlasIntel", "data": "2026-02-24"}, {"idx": 6, "cand": "Renan", "val": 2.9, "inst": "AtlasIntel", "data": "2026-02-24"}, {"idx": 6, "cand": "Lula", "val": 40.2, "inst": "Paraná Pesquisas", "data": "2026-02-25"}, {"idx": 6, "cand": "Flávio", "val": 34.0, "inst": "Paraná Pesquisas", "data": "2026-02-25"}, {"idx": 6, "cand": "Zema", "val": 2.5, "inst": "Paraná Pesquisas", "data": "2026-02-25"}, {"idx": 6, "cand": "Caiado", "val": 3.4, "inst": "Paraná Pesquisas", "data": "2026-02-25"}, {"idx": 6, "cand": "Renan", "val": 1.3, "inst": "Paraná Pesquisas", "data": "2026-02-25"}, {"idx": 7, "cand": "Lula", "val": 39.0, "inst": "Real Time Big Data", "data": "2026-03-02"}, {"idx": 7, "cand": "Flávio", "val": 32.0, "inst": "Real Time Big Data", "data": "2026-03-02"}, {"idx": 7, "cand": "Zema", "val": 2.0, "inst": "Real Time Big Data", "data": "2026-03-02"}, {"idx": 7, "cand": "Renan", "val": 2.0, "inst": "Real Time Big Data", "data": "2026-03-02"}, {"idx": 8, "cand": "Lula", "val": 39.0, "inst": "Datafolha", "data": "2026-03-05"}, {"idx": 8, "cand": "Flávio", "val": 33.0, "inst": "Datafolha", "data": "2026-03-05"}, {"idx": 8, "cand": "Zema", "val": 5.0, "inst": "Datafolha", "data": "2026-03-05"}, {"idx": 8, "cand": "Caiado", "val": 4.0, "inst": "Datafolha", "data": "2026-03-05"}, {"idx": 8, "cand": "Renan", "val": 3.0, "inst": "Datafolha", "data": "2026-03-05"}, {"idx": 8, "cand": "Lula", "val": 39.0, "inst": "Quaest", "data": "2026-03-09"}, {"idx": 8, "cand": "Flávio", "val": 32.0, "inst": "Quaest", "data": "2026-03-09"}, {"idx": 8, "cand": "Zema", "val": 2.0, "inst": "Quaest", "data": "2026-03-09"}, {"idx": 8, "cand": "Caiado", "val": 4.0, "inst": "Quaest", "data": "2026-03-09"}, {"idx": 8, "cand": "Renan", "val": 1.0, "inst": "Quaest", "data": "2026-03-09"}, {"idx": 10, "cand": "Lula", "val": 45.9, "inst": "AtlasIntel", "data": "2026-03-23"}, {"idx": 10, "cand": "Flávio", "val": 40.1, "inst": "AtlasIntel", "data": "2026-03-23"}, {"idx": 10, "cand": "Zema", "val": 3.1, "inst": "AtlasIntel", "data": "2026-03-23"}, {"idx": 10, "cand": "Caiado", "val": 3.7, "inst": "AtlasIntel", "data": "2026-03-23"}, {"idx": 10, "cand": "Renan", "val": 4.4, "inst": "AtlasIntel", "data": "2026-03-23"}, {"idx": 10, "cand": "Lula", "val": 38.0, "inst": "Gerp", "data": "2026-03-25"}, {"idx": 10, "cand": "Flávio", "val": 36.0, "inst": "Gerp", "data": "2026-03-25"}, {"idx": 10, "cand": "Zema", "val": 3.0, "inst": "Gerp", "data": "2026-03-25"}, {"idx": 10, "cand": "Caiado", "val": 3.0, "inst": "Gerp", "data": "2026-03-25"}, {"idx": 10, "cand": "Renan", "val": 1.0, "inst": "Gerp", "data": "2026-03-25"}, {"idx": 11, "cand": "Lula", "val": 40.8, "inst": "Paraná Pesquisas", "data": "2026-03-30"}, {"idx": 11, "cand": "Flávio", "val": 35.1, "inst": "Paraná Pesquisas", "data": "2026-03-30"}, {"idx": 11, "cand": "Zema", "val": 2.1, "inst": "Paraná Pesquisas", "data": "2026-03-30"}, {"idx": 11, "cand": "Caiado", "val": 3.1, "inst": "Paraná Pesquisas", "data": "2026-03-30"}, {"idx": 11, "cand": "Renan", "val": 1.1, "inst": "Paraná Pesquisas", "data": "2026-03-30"}, {"idx": 11, "cand": "Lula", "val": 41.0, "inst": "Nexus/FSB", "data": "2026-03-29"}, {"idx": 11, "cand": "Flávio", "val": 38.0, "inst": "Nexus/FSB", "data": "2026-03-29"}, {"idx": 11, "cand": "Zema", "val": 4.0, "inst": "Nexus/FSB", "data": "2026-03-29"}, {"idx": 11, "cand": "Caiado", "val": 5.0, "inst": "Nexus/FSB", "data": "2026-03-29"}, {"idx": 11, "cand": "Renan", "val": 4.0, "inst": "Nexus/FSB", "data": "2026-03-29"}, {"idx": 12, "cand": "Lula", "val": 40.4, "inst": "Meio/Ideia", "data": "2026-04-07"}, {"idx": 12, "cand": "Flávio", "val": 37.0, "inst": "Meio/Ideia", "data": "2026-04-07"}, {"idx": 12, "cand": "Zema", "val": 3.0, "inst": "Meio/Ideia", "data": "2026-04-07"}, {"idx": 12, "cand": "Caiado", "val": 6.5, "inst": "Meio/Ideia", "data": "2026-04-07"}, {"idx": 12, "cand": "Renan", "val": 3.0, "inst": "Meio/Ideia", "data": "2026-04-07"}, {"idx": 12, "cand": "Lula", "val": 33.2, "inst": "Veritá", "data": "2026-04-07"}, {"idx": 12, "cand": "Flávio", "val": 35.9, "inst": "Veritá", "data": "2026-04-07"}, {"idx": 12, "cand": "Zema", "val": 1.8, "inst": "Veritá", "data": "2026-04-07"}, {"idx": 12, "cand": "Caiado", "val": 1.9, "inst": "Veritá", "data": "2026-04-07"}, {"idx": 12, "cand": "Renan", "val": 1.8, "inst": "Veritá", "data": "2026-04-07"}, {"idx": 13, "cand": "Lula", "val": 39.0, "inst": "Datafolha", "data": "2026-04-09"}, {"idx": 13, "cand": "Flávio", "val": 35.0, "inst": "Datafolha", "data": "2026-04-09"}, {"idx": 13, "cand": "Zema", "val": 4.0, "inst": "Datafolha", "data": "2026-04-09"}, {"idx": 13, "cand": "Caiado", "val": 5.0, "inst": "Datafolha", "data": "2026-04-09"}, {"idx": 13, "cand": "Renan", "val": 2.0, "inst": "Datafolha", "data": "2026-04-09"}, {"idx": 13, "cand": "Lula", "val": 39.8, "inst": "Futura Inteligência", "data": "2026-04-11"}, {"idx": 13, "cand": "Flávio", "val": 37.3, "inst": "Futura Inteligência", "data": "2026-04-11"}, {"idx": 13, "cand": "Zema", "val": 2.9, "inst": "Futura Inteligência", "data": "2026-04-11"}, {"idx": 13, "cand": "Caiado", "val": 4.8, "inst": "Futura Inteligência", "data": "2026-04-11"}, {"idx": 13, "cand": "Renan", "val": 1.4, "inst": "Futura Inteligência", "data": "2026-04-11"}, {"idx": 13, "cand": "Lula", "val": 37.0, "inst": "Quaest", "data": "2026-04-13"}, {"idx": 13, "cand": "Flávio", "val": 32.0, "inst": "Quaest", "data": "2026-04-13"}, {"idx": 13, "cand": "Zema", "val": 3.0, "inst": "Quaest", "data": "2026-04-13"}, {"idx": 13, "cand": "Caiado", "val": 6.0, "inst": "Quaest", "data": "2026-04-13"}, {"idx": 13, "cand": "Renan", "val": 2.0, "inst": "Quaest", "data": "2026-04-13"}, {"idx": 15, "cand": "Lula", "val": 46.6, "inst": "AtlasIntel", "data": "2026-04-27"}, {"idx": 15, "cand": "Flávio", "val": 39.7, "inst": "AtlasIntel", "data": "2026-04-27"}, {"idx": 15, "cand": "Zema", "val": 3.1, "inst": "AtlasIntel", "data": "2026-04-27"}, {"idx": 15, "cand": "Caiado", "val": 3.3, "inst": "AtlasIntel", "data": "2026-04-27"}, {"idx": 15, "cand": "Renan", "val": 5.3, "inst": "AtlasIntel", "data": "2026-04-27"}, {"idx": 16, "cand": "Lula", "val": 40.4, "inst": "Meio/Ideia", "data": "2026-05-05"}, {"idx": 16, "cand": "Flávio", "val": 37.0, "inst": "Meio/Ideia", "data": "2026-05-05"}, {"idx": 16, "cand": "Zema", "val": 3.0, "inst": "Meio/Ideia", "data": "2026-05-05"}, {"idx": 16, "cand": "Caiado", "val": 6.5, "inst": "Meio/Ideia", "data": "2026-05-05"}, {"idx": 16, "cand": "Renan", "val": 3.0, "inst": "Meio/Ideia", "data": "2026-05-05"}, {"idx": 16, "cand": "Lula", "val": 40.0, "inst": "Real Time Big Data", "data": "2026-05-04"}, {"idx": 16, "cand": "Flávio", "val": 34.0, "inst": "Real Time Big Data", "data": "2026-05-04"}, {"idx": 16, "cand": "Zema", "val": 4.0, "inst": "Real Time Big Data", "data": "2026-05-04"}, {"idx": 16, "cand": "Caiado", "val": 5.0, "inst": "Real Time Big Data", "data": "2026-05-04"}, {"idx": 16, "cand": "Renan", "val": 3.0, "inst": "Real Time Big Data", "data": "2026-05-04"}, {"idx": 17, "cand": "Lula", "val": 34.0, "inst": "Gerp", "data": "2026-05-12"}, {"idx": 17, "cand": "Flávio", "val": 36.0, "inst": "Gerp", "data": "2026-05-12"}, {"idx": 17, "cand": "Zema", "val": 5.0, "inst": "Gerp", "data": "2026-05-12"}, {"idx": 17, "cand": "Caiado", "val": 1.0, "inst": "Gerp", "data": "2026-05-12"}, {"idx": 17, "cand": "Renan", "val": 1.0, "inst": "Gerp", "data": "2026-05-12"}, {"idx": 17, "cand": "Lula", "val": 39.0, "inst": "Quaest", "data": "2026-05-11"}, {"idx": 17, "cand": "Flávio", "val": 33.0, "inst": "Quaest", "data": "2026-05-11"}, {"idx": 17, "cand": "Zema", "val": 4.0, "inst": "Quaest", "data": "2026-05-11"}, {"idx": 17, "cand": "Caiado", "val": 4.0, "inst": "Quaest", "data": "2026-05-11"}, {"idx": 17, "cand": "Renan", "val": 2.0, "inst": "Quaest", "data": "2026-05-11"}, {"idx": 18, "cand": "Lula", "val": 38.0, "inst": "Datafolha", "data": "2026-05-14"}, {"idx": 18, "cand": "Flávio", "val": 35.0, "inst": "Datafolha", "data": "2026-05-14"}, {"idx": 18, "cand": "Zema", "val": 3.0, "inst": "Datafolha", "data": "2026-05-14"}, {"idx": 18, "cand": "Caiado", "val": 3.0, "inst": "Datafolha", "data": "2026-05-14"}, {"idx": 18, "cand": "Renan", "val": 2.0, "inst": "Datafolha", "data": "2026-05-14"}, {"idx": 18, "cand": "Lula", "val": 47.0, "inst": "AtlasIntel", "data": "2026-05-18"}, {"idx": 18, "cand": "Flávio", "val": 34.3, "inst": "AtlasIntel", "data": "2026-05-18"}, {"idx": 18, "cand": "Zema", "val": 5.2, "inst": "AtlasIntel", "data": "2026-05-18"}, {"idx": 18, "cand": "Caiado", "val": 2.7, "inst": "AtlasIntel", "data": "2026-05-18"}, {"idx": 18, "cand": "Renan", "val": 6.9, "inst": "AtlasIntel", "data": "2026-05-18"}, {"idx": 19, "cand": "Lula", "val": 42.7, "inst": "Futura Inteligência", "data": "2026-05-21"}, {"idx": 19, "cand": "Flávio", "val": 35.6, "inst": "Futura Inteligência", "data": "2026-05-21"}, {"idx": 19, "cand": "Zema", "val": 3.9, "inst": "Futura Inteligência", "data": "2026-05-21"}, {"idx": 19, "cand": "Caiado", "val": 3.3, "inst": "Futura Inteligência", "data": "2026-05-21"}, {"idx": 19, "cand": "Renan", "val": 1.7, "inst": "Futura Inteligência", "data": "2026-05-21"}, {"idx": 19, "cand": "Lula", "val": 38.0, "inst": "Gerp", "data": "2026-05-22"}, {"idx": 19, "cand": "Flávio", "val": 38.0, "inst": "Gerp", "data": "2026-05-22"}, {"idx": 19, "cand": "Zema", "val": 3.0, "inst": "Gerp", "data": "2026-05-22"}, {"idx": 19, "cand": "Caiado", "val": 2.0, "inst": "Gerp", "data": "2026-05-22"}, {"idx": 19, "cand": "Renan", "val": 3.0, "inst": "Gerp", "data": "2026-05-22"}, {"idx": 19, "cand": "Lula", "val": 40.0, "inst": "Datafolha", "data": "2026-05-21"}, {"idx": 19, "cand": "Flávio", "val": 31.0, "inst": "Datafolha", "data": "2026-05-21"}, {"idx": 19, "cand": "Zema", "val": 3.0, "inst": "Datafolha", "data": "2026-05-21"}, {"idx": 19, "cand": "Caiado", "val": 3.0, "inst": "Datafolha", "data": "2026-05-21"}, {"idx": 19, "cand": "Renan", "val": 3.0, "inst": "Datafolha", "data": "2026-05-21"}, {"idx": 19, "cand": "Lula", "val": 40.0, "inst": "Nexus/FSB", "data": "2026-05-24"}, {"idx": 19, "cand": "Flávio", "val": 35.0, "inst": "Nexus/FSB", "data": "2026-05-24"}, {"idx": 19, "cand": "Zema", "val": 4.0, "inst": "Nexus/FSB", "data": "2026-05-24"}, {"idx": 19, "cand": "Caiado", "val": 5.0, "inst": "Nexus/FSB", "data": "2026-05-24"}, {"idx": 19, "cand": "Renan", "val": 3.0, "inst": "Nexus/FSB", "data": "2026-05-24"}, {"idx": 18, "cand": "Lula", "val": 41.5, "inst": "Vox Brasil", "data": "2026-05-19"}, {"idx": 18, "cand": "Flávio", "val": 32.1, "inst": "Vox Brasil", "data": "2026-05-19"}, {"idx": 18, "cand": "Zema", "val": 4.1, "inst": "Vox Brasil", "data": "2026-05-19"}, {"idx": 18, "cand": "Caiado", "val": 5.9, "inst": "Vox Brasil", "data": "2026-05-19"}, {"idx": 18, "cand": "Renan", "val": 1.5, "inst": "Vox Brasil", "data": "2026-05-19"}, {"idx": 13, "cand": "Lula", "val": 39.2, "inst": "MDA", "data": "2026-04-12"}, {"idx": 13, "cand": "Flávio", "val": 30.2, "inst": "MDA", "data": "2026-04-12"}, {"idx": 13, "cand": "Zema", "val": 3.3, "inst": "MDA", "data": "2026-04-12"}, {"idx": 13, "cand": "Caiado", "val": 4.6, "inst": "MDA", "data": "2026-04-12"}, {"idx": 13, "cand": "Renan", "val": 1.8, "inst": "MDA", "data": "2026-04-12"}, {"idx": 19, "cand": "Lula", "val": 39.0, "inst": "Indexa", "data": "2026-05-24"}, {"idx": 19, "cand": "Flávio", "val": 30.0, "inst": "Indexa", "data": "2026-05-24"}, {"idx": 19, "cand": "Lula", "val": 38.5, "inst": "Meio/Ideia", "data": "2026-05-27"}, {"idx": 19, "cand": "Flávio", "val": 31.5, "inst": "Meio/Ideia", "data": "2026-05-27"}, {"idx": 19, "cand": "Zema", "val": 2.4, "inst": "Meio/Ideia", "data": "2026-05-27"}, {"idx": 19, "cand": "Caiado", "val": 5.5, "inst": "Meio/Ideia", "data": "2026-05-27"}, {"idx": 19, "cand": "Renan", "val": 2.1, "inst": "Meio/Ideia", "data": "2026-05-27"}, {"idx": 20, "cand": "Lula", "val": 40.0, "inst": "PoderData", "data": "2026-05-28"}, {"idx": 20, "cand": "Flávio", "val": 35.0, "inst": "PoderData", "data": "2026-05-28"}, {"idx": 20, "cand": "Zema", "val": 4.0, "inst": "PoderData", "data": "2026-05-28"}, {"idx": 20, "cand": "Caiado", "val": 3.0, "inst": "PoderData", "data": "2026-05-28"}, {"idx": 20, "cand": "Renan", "val": 3.0, "inst": "PoderData", "data": "2026-05-28"}, {"idx": 20, "cand": "Lula", "val": 38.0, "inst": "Real Time Big Data", "data": "2026-05-30"}, {"idx": 20, "cand": "Flávio", "val": 31.0, "inst": "Real Time Big Data", "data": "2026-05-30"}, {"idx": 20, "cand": "Zema", "val": 4.0, "inst": "Real Time Big Data", "data": "2026-05-30"}, {"idx": 20, "cand": "Caiado", "val": 6.0, "inst": "Real Time Big Data", "data": "2026-05-30"}, {"idx": 20, "cand": "Renan", "val": 6.0, "inst": "Real Time Big Data", "data": "2026-05-30"}, {"idx": 20, "cand": "Lula", "val": 42.1, "inst": "Vox Brasil", "data": "2026-06-03"}, {"idx": 20, "cand": "Flávio", "val": 33.6, "inst": "Vox Brasil", "data": "2026-06-03"}, {"idx": 20, "cand": "Zema", "val": 5.1, "inst": "Vox Brasil", "data": "2026-06-03"}, {"idx": 20, "cand": "Caiado", "val": 6.9, "inst": "Vox Brasil", "data": "2026-06-03"}, {"idx": 20, "cand": "Renan", "val": 3.1, "inst": "Vox Brasil", "data": "2026-06-03"}, {"idx": 21, "cand": "Lula", "val": 39.0, "inst": "Quaest", "data": "2026-06-08"}, {"idx": 21, "cand": "Flávio", "val": 29.0, "inst": "Quaest", "data": "2026-06-08"}, {"idx": 21, "cand": "Zema", "val": 2.0, "inst": "Quaest", "data": "2026-06-08"}, {"idx": 21, "cand": "Caiado", "val": 3.0, "inst": "Quaest", "data": "2026-06-08"}, {"idx": 21, "cand": "Renan", "val": 3.0, "inst": "Quaest", "data": "2026-06-08"}, {"idx": 21, "cand": "Lula", "val": 34.0, "inst": "Gerp", "data": "2026-06-05"}, {"idx": 21, "cand": "Flávio", "val": 35.0, "inst": "Gerp", "data": "2026-06-05"}, {"idx": 21, "cand": "Zema", "val": 2.0, "inst": "Gerp", "data": "2026-06-05"}, {"idx": 21, "cand": "Caiado", "val": 2.0, "inst": "Gerp", "data": "2026-06-05"}, {"idx": 21, "cand": "Renan", "val": 4.0, "inst": "Gerp", "data": "2026-06-05"}, {"idx": 17, "cand": "Lula", "val": 38.3, "inst": "Futura Inteligência", "data": "2026-05-08"}, {"idx": 17, "cand": "Flávio", "val": 36.1, "inst": "Futura Inteligência", "data": "2026-05-08"}, {"idx": 3, "cand": "Lula", "val": 38.0, "inst": "Meio/Ideia", "data": "2026-02-02"}, {"idx": 3, "cand": "Flávio", "val": 28.0, "inst": "Meio/Ideia", "data": "2026-02-02"}, {"idx": 3, "cand": "Zema", "val": 2.5, "inst": "Meio/Ideia", "data": "2026-02-02"}, {"idx": 3, "cand": "Caiado", "val": 5.5, "inst": "Meio/Ideia", "data": "2026-02-02"}, {"idx": 3, "cand": "Renan", "val": 2.0, "inst": "Meio/Ideia", "data": "2026-02-02"}, {"idx": 8, "cand": "Lula", "val": 40.3, "inst": "Meio/Ideia", "data": "2026-03-10"}, {"idx": 8, "cand": "Flávio", "val": 35.0, "inst": "Meio/Ideia", "data": "2026-03-10"}, {"idx": 8, "cand": "Zema", "val": 3.0, "inst": "Meio/Ideia", "data": "2026-03-10"}, {"idx": 8, "cand": "Caiado", "val": 6.0, "inst": "Meio/Ideia", "data": "2026-03-10"}, {"idx": 8, "cand": "Renan", "val": 2.5, "inst": "Meio/Ideia", "data": "2026-03-10"}, {"idx": 8, "cand": "Lula", "val": 37.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Flávio", "val": 30.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Zema", "val": 4.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Caiado", "val": 3.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Renan", "val": 1.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Lula", "val": 37.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Flávio", "val": 30.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Zema", "val": 4.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Caiado", "val": 3.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 8, "cand": "Renan", "val": 1.0, "inst": "Alfa Inteligência", "data": "2026-03-11"}, {"idx": 22, "cand": "Lula", "val": 42.0, "inst": "Nexus/FSB", "data": "2026-06-14"}, {"idx": 22, "cand": "Flávio", "val": 33.0, "inst": "Nexus/FSB", "data": "2026-06-14"}, {"idx": 22, "cand": "Zema", "val": 2.0, "inst": "Nexus/FSB", "data": "2026-06-14"}, {"idx": 22, "cand": "Caiado", "val": 4.0, "inst": "Nexus/FSB", "data": "2026-06-14"}, {"idx": 22, "cand": "Renan", "val": 4.0, "inst": "Nexus/FSB", "data": "2026-06-14"}, {"idx": 22, "cand": "Lula", "val": 41.6, "inst": "Futura Inteligência", "data": "2026-06-12"}, {"idx": 22, "cand": "Flávio", "val": 34.1, "inst": "Futura Inteligência", "data": "2026-06-12"}, {"idx": 22, "cand": "Zema", "val": 3.5, "inst": "Futura Inteligência", "data": "2026-06-12"}, {"idx": 22, "cand": "Caiado", "val": 4.5, "inst": "Futura Inteligência", "data": "2026-06-12"}, {"idx": 22, "cand": "Renan", "val": 2.3, "inst": "Futura Inteligência", "data": "2026-06-12"}, {"idx": 22, "cand": "Lula", "val": 41.8, "inst": "MDA", "data": "2026-06-14"}, {"idx": 22, "cand": "Flávio", "val": 28.2, "inst": "MDA", "data": "2026-06-14"}, {"idx": 22, "cand": "Zema", "val": 2.8, "inst": "MDA", "data": "2026-06-14"}, {"idx": 22, "cand": "Caiado", "val": 4.0, "inst": "MDA", "data": "2026-06-14"}, {"idx": 22, "cand": "Renan", "val": 2.0, "inst": "MDA", "data": "2026-06-14"}, {"idx": 23, "cand": "Lula", "val": 41.0, "inst": "Datafolha", "data": "2026-06-19"}, {"idx": 23, "cand": "Flávio", "val": 31.0, "inst": "Datafolha", "data": "2026-06-19"}, {"idx": 23, "cand": "Zema", "val": 2.0, "inst": "Datafolha", "data": "2026-06-19"}, {"idx": 23, "cand": "Caiado", "val": 3.0, "inst": "Datafolha", "data": "2026-06-19"}, {"idx": 23, "cand": "Renan", "val": 3.0, "inst": "Datafolha", "data": "2026-06-19"}, {"idx": 23, "cand": "Lula", "val": 42.0, "inst": "Indexa", "data": "2026-06-20"}, {"idx": 23, "cand": "Lula", "val": 63.9, "inst": "AtlasIntel", "data": "2026-06-21"}, {"idx": 22, "cand": "Lula", "val": 38.0, "inst": "AMERICAN ANALYTICS", "data": "2026-06-15"}, {"idx": 22, "cand": "Flávio", "val": 30.0, "inst": "AMERICAN ANALYTICS", "data": "2026-06-15"}, {"idx": 22, "cand": "Zema", "val": 2.0, "inst": "AMERICAN ANALYTICS", "data": "2026-06-15"}, {"idx": 22, "cand": "Caiado", "val": 4.0, "inst": "AMERICAN ANALYTICS", "data": "2026-06-15"}, {"idx": 22, "cand": "Renan", "val": 3.0, "inst": "AMERICAN ANALYTICS", "data": "2026-06-15"}, {"idx": 7, "cand": "Lula", "val": 36.3, "inst": "Vetor", "data": "2026-03-03"}, {"idx": 7, "cand": "Flávio", "val": 44.0, "inst": "Vetor", "data": "2026-03-03"}, {"idx": 7, "cand": "Zema", "val": 2.3, "inst": "Vetor", "data": "2026-03-03"}, {"idx": 7, "cand": "Renan", "val": 1.8, "inst": "Vetor", "data": "2026-03-03"}]};
+  var wrap = document.querySelector('.grafico-wrap');
+  var legendaEl = document.getElementById('legenda-tend');
+
+  if (!DADOS) {
+    wrap.innerHTML = '<div class="sem-dados">Ainda não há dados suficientes.</div>';
+    return;
+  }
+
+  function seta(delta){
+    if (delta > 2.0)  return {t:'⇈', cor:'#1D9E75'};
+    if (delta > 0.5)  return {t:'↑', cor:'#1D9E75'};
+    if (delta >= -0.5)return {t:'→', cor:'#888780'};
+    if (delta >= -2.0)return {t:'↓', cor:'#D85A30'};
+    return {t:'⇊', cor:'#C0392B'};
+  }
+
+  function lastIdx(a){
+    for(var i=a.length-1;i>=0;i--) if(a[i]!=null) return i;
+    return -1;
+  }
+
+  // Valor de N pontos não-nulos atrás
+  function valAgo(dados, idx, n){
+    var count=0;
+    for(var i=idx-1;i>=0;i--){
+      if(dados[i]!=null){ count++; if(count>=n) return dados[i]; }
+    }
+    return dados[idx];
+  }
+
+  var labels = DADOS.labels;
+
+  // Plugin: pontos brutos das pesquisas individuais
+  var pontosBrutos = {
+    id: 'pontosBrutos',
+    afterDatasetsDraw: function(chart) {
+      var raw = DADOS.raw;
+      if (!raw || !raw.length) return;
+      var ctx = chart.ctx, xs = chart.scales.x, ys = chart.scales.y;
+      var corPorCand = {};
+      DADOS.series.forEach(function(s){ corPorCand[s.label] = s.cor; });
+      ctx.save();
+      raw.forEach(function(p) {
+        var cor = corPorCand[p.cand];
+        if (!cor) return;
+        var px = xs.getPixelForValue(p.idx);
+        var py = ys.getPixelForValue(p.val);
+        ctx.beginPath();
+        ctx.arc(px, py, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.strokeStyle = cor;
+        ctx.lineWidth = 1.8;
+        ctx.globalAlpha = 0.8;
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      });
+      ctx.restore();
+    }
+  };
+
+  // Tooltip personalizado que mostra instituto ao passar sobre ponto bruto
+  var tooltipEl = null;
+  function mostrarTooltip(inst, val, cand, data, x, y) {
+    if (!tooltipEl) {
+      tooltipEl = document.createElement('div');
+      tooltipEl.style.cssText = 'position:fixed;background:#1A2B4A;color:#fff;padding:5px 9px;border-radius:5px;font-size:11px;pointer-events:none;z-index:100;white-space:nowrap;';
+      document.body.appendChild(tooltipEl);
+    }
+    tooltipEl.innerHTML = '<b>' + inst + '</b>: ' + val + '% (' + data + ')';
+    tooltipEl.style.display = 'block';
+    tooltipEl.style.left = (x + 14) + 'px';
+    tooltipEl.style.top  = (y - 10) + 'px';
+  }
+  function esconderTooltip() {
+    if (tooltipEl) tooltipEl.style.display = 'none';
+  }
+  // Separar séries: principal = Lula+Flávio, secundário = demais
+  var seriesPrinc = DADOS.series_sec
+    ? DADOS.series.filter(function(s){ return s.label==='Lula'||s.label==='Flávio'; })
+    : DADOS.series;
+  if (!seriesPrinc.length) seriesPrinc = DADOS.series;
+
+  var datasets = seriesPrinc.map(function(s){
+    return {
+      label: s.label, data: s.dados,
+      borderColor: s.cor, backgroundColor: s.cor+'22',
+      borderWidth: s.largura, pointRadius: 0, tension: 0.35, spanGaps: true
+    };
+  });
+
+  var faixa = {
+    id:'faixa',
+    beforeDraw: function(chart){
+      var ctx=chart.ctx, x=chart.scales.x, y=chart.scales.y;
+      var n=DADOS.labels.length, pts4=Math.max(1,Math.round(28/DADOS.passo_dias));
+      var x0=x.getPixelForValue(Math.max(0,n-pts4)), x1=x.getPixelForValue(n-1);
+      var top=chart.chartArea.top, bot=chart.chartArea.bottom;
+      ctx.save();
+      ctx.fillStyle='rgba(200,200,200,0.15)';
+      ctx.fillRect(x0,top,x1-x0,bot-top);
+      ctx.fillStyle='#bbb'; ctx.font='11px Arial'; ctx.textAlign='center';
+      ctx.fillText('últimas 4 semanas',(x0+x1)/2,top+12);
+      ctx.restore();
+    }
+  };
+
+  var setasFlutuantes = {
+    id:'setasFlutuantes',
+    afterDatasetsDraw: function(chart){
+      var ctx=chart.ctx, x=chart.scales.x, y=chart.scales.y;
+      var xUlt=x.getPixelForValue(DADOS.labels.length-1);
+      var usados=[];
+      ctx.save(); ctx.textBaseline='middle';
+      seriesPrinc.forEach(function(s){
+        var i=lastIdx(s.dados); if(i<0) return;
+        var pts4=Math.max(1,Math.round(28/DADOS.passo_dias));
+        var delta=s.dados[i] - valAgo(s.dados,i,pts4);
+        var t=seta(delta);
+        var yLinha=y.getPixelForValue(s.dados[i]);
+        var yS=yLinha-22;
+        if(yS<chart.chartArea.top+8) yS=chart.chartArea.top+8;
+        usados.forEach(function(u){ if(Math.abs(u-yS)<18) yS=u-18; });
+        usados.push(yS);
+        ctx.beginPath(); ctx.arc(xUlt,yLinha,3,0,Math.PI*2);
+        ctx.fillStyle=s.cor; ctx.fill();
+        ctx.font='500 18px sans-serif'; ctx.fillStyle=t.cor; ctx.textAlign='center';
+        ctx.fillText(t.t, xUlt+18, yS);
+        ctx.font='bold 12px Arial'; ctx.fillStyle=s.cor;
+        ctx.fillText(s.dados[i].toFixed(1)+'%', xUlt+42, yS);
+      });
+      ctx.restore();
+    }
+  };
+
+  window._chartInst = new Chart(document.getElementById('grafico'),{
+    type:'line',
+    data:{labels:labels, datasets:datasets},
+    plugins:[faixa, setasFlutuantes, pontosBrutos],
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{padding:{right:80,top:8}},
+      interaction:{mode:'index',intersect:false},
+      scales:{
+        x:{grid:{display:false}, ticks:{maxRotation:45,font:{size:10}}},
+        y:{min:25, max:55, ticks:{callback:function(v){return v+'%';}}}
+      },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:function(c){
+          return c.dataset.label+': '+(c.parsed.y==null?'—':c.parsed.y.toFixed(1)+'%');
+        }}}
+      }
+    }
+  });
+
+  if(legendaEl){
+    var parts = seriesPrinc.map(function(s){
+      var i=lastIdx(s.dados); if(i<0) return '';
+      var pts4=Math.max(1,Math.round(28/DADOS.passo_dias));
+      var delta=s.dados[i] - valAgo(s.dados,i,pts4);
+      var t=seta(delta);
+      return '<span style="color:'+s.cor+';font-weight:600">'+s.label+'</span> '+
+             '<span style="color:'+t.cor+'">'+t.t+'</span>';
+    }).filter(Boolean);
+    legendaEl.innerHTML = parts.join(' &nbsp;·&nbsp; ') +
+      ' &nbsp;<span style="color:#aaa;font-size:0.95em">(vs 4 semanas atrás)</span>';
+  }
+
+  // ── Gráfico secundário: Zema, Caiado, Renan, outros (escala 0-15%) ──
+  var seriesSec = DADOS.series_sec;
+  if (seriesSec && seriesSec.length) {
+    document.getElementById('label-sec').style.display = 'block';
+    document.getElementById('wrap-sec').style.display  = 'block';
+
+    var faixaSec = {
+      id:'faixaSec',
+      beforeDraw: function(chart){
+        var ctx=chart.ctx, x=chart.scales.x, y=chart.scales.y;
+        var n=labels.length, pts4=Math.max(1,Math.round(28/DADOS.passo_dias));
+        var x0=x.getPixelForValue(Math.max(0,n-pts4)), x1=x.getPixelForValue(n-1);
+        var top=chart.chartArea.top, bot=chart.chartArea.bottom;
+        ctx.save();
+        ctx.fillStyle='rgba(200,200,200,0.15)';
+        ctx.fillRect(x0,top,x1-x0,bot-top);
+        ctx.fillStyle='#bbb'; ctx.font='11px Arial'; ctx.textAlign='center';
+        ctx.fillText('últimas 4 semanas',(x0+x1)/2,top+12);
+        ctx.restore();
+      }
+    };
+
+    var setasSecundarias = {
+      id:'setasSecundarias',
+      afterDatasetsDraw: function(chart){
+        var ctx=chart.ctx, x=chart.scales.x, y=chart.scales.y;
+        var xUlt=x.getPixelForValue(labels.length-1);
+        var usados=[];
+        ctx.save(); ctx.textBaseline='middle';
+        seriesSec.forEach(function(s){
+          var i=lastIdx(s.dados); if(i<0) return;
+          var pts4=Math.max(1,Math.round(28/DADOS.passo_dias));
+          var delta=s.dados[i] - valAgo(s.dados,i,pts4);
+          var t=seta(delta);
+          var yLinha=y.getPixelForValue(s.dados[i]);
+          var yS=yLinha-8;
+          if(yS<chart.chartArea.top+8) yS=chart.chartArea.top+8;
+          usados.forEach(function(u){ if(Math.abs(u-yS)<16) yS=u-16; });
+          usados.push(yS);
+          ctx.beginPath(); ctx.arc(xUlt,yLinha,3,0,Math.PI*2);
+          ctx.fillStyle=s.cor; ctx.fill();
+          // Seta
+          ctx.font='500 15px sans-serif'; ctx.fillStyle=t.cor; ctx.textAlign='center';
+          ctx.fillText(t.t, xUlt+14, yS);
+          // Nome do candidato
+          ctx.font='bold 11px Arial'; ctx.fillStyle=s.cor; ctx.textAlign='left';
+          ctx.fillText(s.label+' '+s.dados[i].toFixed(1)+'%', xUlt+26, yS);
+        });
+        ctx.restore();
+      }
+    };
+
+    var chartSec = new Chart(document.getElementById('grafico-sec'),{
+      type:'line',
+      data:{
+        labels: labels,
+        datasets: seriesSec.map(function(s){
+          return {
+            label: s.label, data: s.dados,
+            borderColor: s.cor, backgroundColor: s.cor+'22',
+            borderWidth: 2, pointRadius: 0, tension: 0.35, spanGaps: true
+          };
+        })
+      },
+      plugins: [faixaSec, setasSecundarias],
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        layout:{padding:{right:110, top:8}},
+        interaction:{mode:'index',intersect:false},
+        scales:{
+          x:{grid:{display:false}, ticks:{maxRotation:45,font:{size:10}}},
+          y:{min:0, max:15, ticks:{callback:function(v){return v+'%';}}}
+        },
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:function(c){
+            return c.dataset.label+': '+(c.parsed.y==null?'—':c.parsed.y.toFixed(1)+'%');
+          }}}
+        }
+      }
+    });
+
+    var legSec = document.getElementById('legenda-tend-sec');
+    if(legSec){
+      var pSec = seriesSec.map(function(s){
+        var i=lastIdx(s.dados); if(i<0) return '';
+        var pts4=Math.max(1,Math.round(28/DADOS.passo_dias));
+        var delta=s.dados[i] - valAgo(s.dados,i,pts4);
+        var t=seta(delta);
+        return '<span style="color:'+s.cor+';font-weight:600">'+s.label+'</span> '+
+               (i>=0?s.dados[i].toFixed(1)+'% ':'')+
+               '<span style="color:'+t.cor+'">'+t.t+'</span>';
+      }).filter(Boolean);
+      legSec.innerHTML = pSec.join(' &nbsp;·&nbsp; ') +
+        ' &nbsp;<span style="color:#aaa;font-size:0.95em">(vs 4 semanas atrás)</span>';
+    }
+  }
+
+  // Tooltip interativo nos pontos brutos
+  if (DADOS.raw && DADOS.raw.length) {
+    var canvas = document.getElementById('grafico');
+    canvas.addEventListener('mousemove', function(evt) {
+      var rect = canvas.getBoundingClientRect();
+      var mx = evt.clientX - rect.left;
+      var my = evt.clientY - rect.top;
+      var chart = window._chartInst;
+      if (!chart) return;
+      var xs = chart.scales.x, ys = chart.scales.y;
+      var encontrou = false;
+      for (var i = 0; i < DADOS.raw.length; i++) {
+        var p = DADOS.raw[i];
+        var px = xs.getPixelForValue(p.idx);
+        var py = ys.getPixelForValue(p.val);
+        if (Math.abs(px - mx) < 8 && Math.abs(py - my) < 8) {
+          mostrarTooltip(p.inst, p.val, p.cand, p.data, evt.clientX, evt.clientY);
+          encontrou = true;
+          break;
+        }
+      }
+      if (!encontrou) esconderTooltip();
+    });
+    canvas.addEventListener('mouseleave', esconderTooltip);
+  }
+  // ── Gráficos de 2º turno ──────────────────────────────────────────────
+  var DADOS_2T = [{"labels": ["11/jan", "18/jan", "25/jan", "01/fev", "08/fev", "15/fev", "22/fev", "01/mar", "08/mar", "15/mar", "22/mar", "29/mar", "05/abr", "12/abr", "19/abr", "26/abr", "03/mai", "10/mai", "17/mai", "24/mai", "31/mai", "07/jun", "14/jun", "21/jun", "23/jun"], "series": [{"label": "Lula", "cor": "#C0392B", "dados": [40.0, 41.3, 42.6, 42.3, 43.1, 42.4, 41.6, 42.7, 43.9, 43.1, 43.4, 44.0, 43.2, 44.5, 43.2, 43.2, 43.6, 43.4, 44.0, 45.4, 45.4, 45.5, 46.4, 46.3, 46.4], "largura": 3.5}, {"label": "Flávio", "cor": "#2471A3", "dados": [41.0, 39.9, 41.1, 40.2, 40.8, 41.8, 41.3, 42.0, 42.2, 41.8, 41.7, 43.0, 42.4, 44.6, 43.8, 43.7, 44.3, 43.7, 43.8, 43.1, 42.5, 42.3, 40.6, 40.9, 40.8], "largura": 3.5}], "passo_dias": 7, "janela_dias": 30, "titulo": "Lula vs Flávio"}, {"labels": ["11/jan", "18/jan", "25/jan", "01/fev", "08/fev", "15/fev", "22/fev", "01/mar", "08/mar", "15/mar", "22/mar", "29/mar", "05/abr", "12/abr", "19/abr", "26/abr", "03/mai", "10/mai", "17/mai", "24/mai", "31/mai", "07/jun", "14/jun", "21/jun", "23/jun"], "series": [{"label": "Lula", "cor": "#C0392B", "dados": [43.0, 43.0, 44.1, 44.1, 44.1, 43.2, 42.0, 43.4, 44.8, 44.6, 44.9, 45.2, 45.0, 45.2, 44.5, 44.4, 44.6, 44.1, 44.9, 46.5, 46.3, 46.4, 46.6, 45.8, 45.8], "largura": 3.5}, {"label": "Zema", "cor": "#CA8A04", "dados": [34.0, 34.0, 35.5, 35.5, 35.5, 35.9, 35.0, 37.4, 36.4, 35.2, 35.2, 36.3, 36.6, 39.3, 38.2, 37.9, 38.9, 38.7, 39.7, 38.5, 38.2, 37.9, 36.4, 36.2, 36.2], "largura": 3.5}], "passo_dias": 7, "janela_dias": 30, "titulo": "Lula vs Zema"}];
+  var container2t = document.getElementById('graficos-2t');
+
+  if (DADOS_2T && DADOS_2T.length && container2t) {
+    // Grid 2 colunas
+    container2t.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-bottom:16px';
+
+    DADOS_2T.forEach(function(d, idx) {
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'background:#fff;border-radius:8px;padding:10px;box-shadow:0 1px 4px rgba(0,0,0,0.08)';
+
+      var tit = document.createElement('div');
+      tit.style.cssText = 'font-size:0.85rem;font-weight:600;color:#444;margin-bottom:6px';
+      tit.textContent = d.titulo;
+      wrap.appendChild(tit);
+
+      var wrapCanvas = document.createElement('div');
+      wrapCanvas.style.cssText = 'position:relative;height:200px';
+      var canvas = document.createElement('canvas');
+      canvas.id = 'g2t-' + idx;
+      wrapCanvas.appendChild(canvas);
+      wrap.appendChild(wrapCanvas);
+
+      // Legenda + valor atual
+      var leg = document.createElement('div');
+      leg.style.cssText = 'display:flex;gap:12px;margin-top:6px;font-size:0.75rem;flex-wrap:wrap';
+      d.series.forEach(function(s) {
+        var i2 = lastIdx(s.dados);
+        var pts4 = Math.max(1, Math.round(28/d.passo_dias));
+        var delta = i2>=0 ? s.dados[i2] - valAgo(s.dados, i2, pts4) : 0;
+        var t = seta(delta);
+        var span = document.createElement('span');
+        span.style.cssText = 'display:flex;align-items:center;gap:4px';
+        span.innerHTML = '<span style="width:10px;height:10px;border-radius:2px;background:'+s.cor+';display:inline-block"></span>'
+          + '<b style="color:'+s.cor+'">' + s.label + '</b>'
+          + (i2>=0 ? ' ' + s.dados[i2].toFixed(1) + '%' : '')
+          + ' <span style="color:'+t.cor+'">' + t.t + '</span>';
+        leg.appendChild(span);
+      });
+      wrap.appendChild(leg);
+      container2t.appendChild(wrap);
+
+      // Renderizar chart
+      new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: d.labels,
+          datasets: d.series.map(function(s) {
+            return {
+              label: s.label, data: s.dados,
+              borderColor: s.cor, backgroundColor: s.cor + '18',
+              borderWidth: s.largura || 2,
+              pointRadius: 0, tension: 0.35, spanGaps: true
+            };
+          })
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          layout: { padding: { right: 8 } },
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxRotation: 45, font: { size: 9 }, maxTicksLimit: 8 } },
+            y: { min: 25, max: 60, ticks: { callback: function(v){ return v+'%'; }, font: { size: 9 } } }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: function(c){ return c.dataset.label+': '+(c.parsed.y==null?'—':c.parsed.y.toFixed(1)+'%'); }}}
+          }
+        }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>
