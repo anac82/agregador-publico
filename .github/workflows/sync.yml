@@ -1,0 +1,56 @@
+name: Sincronizar HTML do agregador
+
+on:
+  schedule:
+    - cron: '15 12 * * *'    # 09h15 Brasília (15min após o privado rodar)
+    - cron: '15 15 * * *'    # 12h15 Brasília (15min após o privado rodar)
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repo público
+        uses: actions/checkout@v5
+
+      - name: Baixar index.html do repo privado
+        env:
+          GH_TOKEN: ${{ secrets.PRIVATE_REPO_TOKEN }}
+        run: |
+          mkdir -p docs
+
+          # Baixar via API do GitHub usando token de leitura do repo privado
+          curl -sSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github.v3.raw" \
+            -o docs/index.html \
+            "https://api.github.com/repos/anac82/agregador-pesquisas/contents/docs/index.html?ref=main"
+
+          # Verificar que o download funcionou (arquivo > 1KB)
+          if [ ! -s docs/index.html ] || [ "$(stat -c%s docs/index.html)" -lt 1024 ]; then
+            echo "❌ Falha ao baixar o HTML do repo privado"
+            cat docs/index.html
+            exit 1
+          fi
+
+          echo "✅ HTML baixado: $(stat -c%s docs/index.html) bytes"
+
+      - name: Commitar mudanças
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add docs/index.html
+
+          if git diff --staged --quiet; then
+            echo "Sem mudanças no HTML"
+            exit 0
+          fi
+
+          git commit -m "atualização $(date +'%Y-%m-%d %H:%M')"
+          git push origin main
